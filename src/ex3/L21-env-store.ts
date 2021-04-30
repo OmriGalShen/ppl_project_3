@@ -86,11 +86,13 @@ const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> =>{
 }
     // Complete
 
-export const globalEnvAddBinding = (v: string, addr: number): void =>{
+export const globalEnvAddapplyEnvStoreBinding = (v: string, addr: number): void =>{
         setBox(theGlobalEnv.vars,unbox(theGlobalEnv.vars).concat([v]));
         setBox(theGlobalEnv.addresses,unbox(theGlobalEnv.addresses).concat([addr]));
 }    
 // Complete
+
+export const applyEnvStore = (env:Env, v:string):Result<Value> => bind(applyEnv(env,v),add=>applyStore(theStore,add))  
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
