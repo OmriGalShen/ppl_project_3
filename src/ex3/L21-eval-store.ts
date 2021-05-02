@@ -10,7 +10,7 @@ import { applyEnv, makeExtEnv, Env, Store, setStore, extendStore, ExtEnv, applyE
 import { isClosure, makeClosure, Closure, Value } from "./L21-value-store";
 import { applyPrimitive } from "./evalPrimitive-store";
 import { first, rest, isEmpty } from "../shared/list";
-import { Result, bind, safe2, mapResult, makeFailure, makeOk } from "../shared/result";
+import { Result, bind, safe2, mapResult, makeFailure, makeOk, isOk, isFailure } from "../shared/result";
 import { parse as p } from "../shared/parser";
 
 // ========================================================
@@ -50,7 +50,19 @@ const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>
 
 const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
     const vars = map((v: VarDecl) => v.var, proc.params);
-    const addresses: number[] = ...
+    
+    const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return theStore.vals.length-1;}, args);
+    
+    
+    // const addressesResults: Result<number[]> = mapResult((v: string) => applyEnv(proc.env,v), vars);
+    // if(isFailure(addressesResults))
+    //     return makeFailure("Problem with fetching vars addresses")
+    
+    // const addresses: number[] = addressesResults.value;
+    
+    
+    // const addresses: number[] = [];
+
     const newEnv: ExtEnv = makeExtEnv(vars, addresses, proc.env)
     return evalSequence(proc.body, newEnv);
 }
@@ -85,10 +97,9 @@ export const evalParse = (s: string): Result<Value> =>
 const evalLet = (exp: LetExp, env: Env): Result<Value> => {
     const vals = mapResult((v: CExp) => applicativeEval(v, env), map((b: Binding) => b.val, exp.bindings));
     const vars = map((b: Binding) => b.var.var, exp.bindings);
-
     
     return bind(vals, (vals: Value[]) => {
-        const addresses = ...
+        const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return theStore.vals.length-1;}, vals);
         const newEnv = makeExtEnv(vars, addresses, env)
         return evalSequence(exp.body, newEnv);
     })
