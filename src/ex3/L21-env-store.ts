@@ -29,16 +29,16 @@ export const extendStore = (s: Store, val: Value): Store =>
     // Complete
     
 export const applyStore = (store: Store, address: number): Result<Value> => 
-    address>=0 && address<theStore.vals.length? 
-    makeOk(unbox(theStore.vals[address])):
+    address>=0 && address<store.vals.length? 
+    makeOk(unbox(store.vals[address])):
     makeFailure("Invalid store address")
     // Complete
 
     
-export const setStore = (store: Store, address: number, val: Value): void =>
-    address>=0 && address<theStore.vals.length? 
-    setBox(theStore.vals[address],val):
-    undefined
+export const setStore = (store: Store, address: number, val: Value): void =>{
+    if(address>=0 && address<store.vals.length) 
+        setBox(store.vals[address],val)
+}
 
 
 // ========================================================
@@ -80,6 +80,7 @@ export const applyEnv = (env: Env, v: string): Result<number> =>
     applyExtEnv(env, v);
 
 const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> =>{
+    
     const pos = unbox(env.vars).indexOf(v);
     if(pos === -1) return makeFailure("invalid var name");
     return makeOk(unbox(env.addresses)[pos]);
@@ -92,13 +93,25 @@ export const globalEnvAddapplyEnvStoreBinding = (v: string, addr: number): void 
 }    
 // Complete
 
-export const applyEnvStore = (env:Env, v:string):Result<Value> => bind(applyEnv(env,v),add=>applyStore(theStore,add))  
+export const applyEnvStore = (env:Env, v:string):Result<Value> => bind(applyEnv(env,v),addr=>applyStore(theStore,addr))  
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
     applyEnv(env.nextEnv, v);
 
 export const globalEnvAddBinding = (v: string, val: Value): void => {
+    // TODO: FIXXXXXXX PUSH
+    
+    // console.log(`v:${v},val:${val}`);
+    
+    // console.log("before:",theGlobalEnv);
+    // console.log("before:",theStore);
     globalEnvAddapplyEnvStoreBinding(v,theStore.vals.length);
-    extendStore(theStore,v);
+
+    // console.log("val ",unbox(theStore.vals));
+    theStore.vals.push(makeBox(val)) //?????????????????????
+    // const newStoreVals = unbox(theStore.vals).concat([val]);
+    // setBox(theStore.vals,newStoreVals);
+    // console.log("after:",theGlobalEnv);
+    // console.log("after:",theStore);
 }
