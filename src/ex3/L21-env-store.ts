@@ -22,10 +22,15 @@ export const isStore = (x: any): x is Store => x.tag === "Store";
 export const makeEmptyStore = (): Store =>
 ({tag: "Store", vals: []});
 export const theStore: Store =  makeEmptyStore();
+
 // export const extendStore = (s: Store, val: Value): Store =>
-//     ({tag:"Store",vals:cons(makeBox(val),s.vals)})
-export const extendStore = (s: Store, val: Value): Store =>
-    ({tag:"Store",vals:s.vals.concat([makeBox(val)])})
+//     ({tag:"Store",vals:s.vals.concat([makeBox(val)])})
+//     // Complete
+    
+export const extendStore = (s: Store, val: Value): Store =>{
+    s.vals.push(makeBox(val));
+    return s;
+}
     // Complete
     
 export const applyStore = (store: Store, address: number): Result<Value> => 
@@ -100,7 +105,6 @@ const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     applyEnv(env.nextEnv, v);
 
 export const globalEnvAddBinding = (v: string, val: Value): void => {
-    // TODO: FIXXXXXXX PUSH
     
     // console.log(`v:${v},val:${val}`);
     
@@ -109,7 +113,7 @@ export const globalEnvAddBinding = (v: string, val: Value): void => {
     globalEnvAddapplyEnvStoreBinding(v,theStore.vals.length);
 
     // console.log("val ",unbox(theStore.vals));
-    theStore.vals.push(makeBox(val)) //?????????????????????
+    extendStore(theStore,val) //?????????????????????
     // const newStoreVals = unbox(theStore.vals).concat([val]);
     // setBox(theStore.vals,newStoreVals);
     // console.log("after:",theGlobalEnv);
