@@ -68,8 +68,10 @@ const evalCExps = (first: Exp, rest: Exp[], env: Env): Result<Value> =>
 
 const evalDefineExps = (def: DefineExp, exps: Exp[]): Result<Value> =>
     bind(applicativeEval(def.val, theGlobalEnv),
-    (rhs: Value) => { globalEnvAddBinding(def.var.var, rhs);
-                    return evalSequence(exps, theGlobalEnv); });    
+    (rhs: Value) => { 
+        extendStore(theStore,rhs);
+        globalEnvAddBinding(def.var.var, theStore.vals.length-1);                    
+        return evalSequence(exps, theGlobalEnv); });    
 // complete
 
 // Main program
