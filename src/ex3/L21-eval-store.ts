@@ -12,6 +12,7 @@ import { applyPrimitive } from "./evalPrimitive-store";
 import { first, rest, isEmpty } from "../shared/list";
 import { Result, bind, safe2, mapResult, makeFailure, makeOk, isOk, isFailure } from "../shared/result";
 import { parse as p } from "../shared/parser";
+import { unbox } from "../shared/box";
 
 // ========================================================
 // Eval functions
@@ -50,7 +51,7 @@ const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>
 
 const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
     const vars = map((v: VarDecl) => v.var, proc.params);
-    const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return theStore.vals.length-1;}, args);
+    const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return unbox(theStore.vals).length-1;}, args);
     const newEnv: ExtEnv = makeExtEnv(vars, addresses, proc.env)
     return evalSequence(proc.body, newEnv);
 }
@@ -70,7 +71,7 @@ const evalDefineExps = (def: DefineExp, exps: Exp[]): Result<Value> =>
     bind(applicativeEval(def.val, theGlobalEnv),
     (rhs: Value) => { 
         extendStore(theStore,rhs);
-        globalEnvAddBinding(def.var.var, theStore.vals.length-1);                    
+        globalEnvAddBinding(def.var.var, unbox(theStore.vals).length-1);                    
         return evalSequence(exps, theGlobalEnv); });    
 // complete
 
@@ -89,7 +90,7 @@ const evalLet = (exp: LetExp, env: Env): Result<Value> => {
     const vars = map((b: Binding) => b.var.var, exp.bindings);
     
     return bind(vals, (vals: Value[]) => {
-        const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return theStore.vals.length-1;}, vals);
+        const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return unbox(theStore.vals).length-1;}, vals);
         const newEnv = makeExtEnv(vars, addresses, env)
         return evalSequence(exp.body, newEnv);
     })
