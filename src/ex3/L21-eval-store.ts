@@ -50,19 +50,7 @@ const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>
 
 const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
     const vars = map((v: VarDecl) => v.var, proc.params);
-    
     const addresses: number[] = map((v: Value) => {extendStore(theStore,v); return theStore.vals.length-1;}, args);
-    
-    
-    // const addressesResults: Result<number[]> = mapResult((v: string) => applyEnv(proc.env,v), vars);
-    // if(isFailure(addressesResults))
-    //     return makeFailure("Problem with fetching vars addresses")
-    
-    // const addresses: number[] = addressesResults.value;
-    
-    
-    // const addresses: number[] = [];
-
     const newEnv: ExtEnv = makeExtEnv(vars, addresses, proc.env)
     return evalSequence(proc.body, newEnv);
 }
