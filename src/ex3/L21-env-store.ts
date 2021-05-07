@@ -25,10 +25,6 @@ export const isStore = (x: any): x is Store => x.tag === "Store";
 export const makeEmptyStore = (): Store => ({ tag: "Store", vals: makeBox([]) });
 export const theStore: Store = makeEmptyStore();
 
-// export const extendStore = (s: Store, val: Value): Store =>
-//     ({tag:"Store",vals:s.vals.concat([makeBox(val)])})
-//     // Complete
-
 export const extendStore = (s: Store, val: Value): Store => {
   setBox(s.vals, unbox(s.vals).concat([makeBox(val)]));
   return s;
@@ -108,4 +104,4 @@ export const applyEnvStore = (env: Env, v: string): Result<Value> =>
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
   env.vars.includes(v)
     ? makeOk(env.addresses[env.vars.indexOf(v)])
-    : applyEnv(env.nextEnv, v);
+    : applyEnv(env.nextEnv, v);  

@@ -96,6 +96,5 @@ const evalLet = (exp: LetExp, env: Env): Result<Value> => {
     })
 }
 
-// L4-eval-box: Handling of mutation with set!
 const evalSet = (exp: SetExp, env: Env): Result<void> =>
-    bind(applicativeEval(exp.val, env),val => bind(applyEnv(env,exp.var.var),addr => makeOk(setStore(theStore,addr,val)) ));
+    safe2((val:Value,addr:number)=>makeOk(setStore(theStore,addr,val)))(applicativeEval(exp.val, env),applyEnv(env,exp.var.var));
