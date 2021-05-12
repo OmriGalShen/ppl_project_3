@@ -8,5 +8,6 @@ run 'npm i' in terminal
 ### How to test:
 run 'npm test' in terminal
 
-A visual illustration of trying to understand the L2 code:  
-![alt text](https://media.giphy.com/media/NlR0RF1v972Mw/giphy.gif)  
+A visual illustration of working with the box interface:  
+  
+![alt text](https://media.giphy.com/media/ge91zAgmwUqLMqiH2c/giphy.gif)  
